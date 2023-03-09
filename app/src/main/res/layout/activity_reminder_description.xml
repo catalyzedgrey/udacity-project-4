@@ -16,18 +16,51 @@
         android:gravity="center"
         android:orientation="vertical"
         tools:context=".locationreminders.ReminderDescriptionActivity">
-        <!--TODO: add the design of the reminder details-->
 
         <TextView
+            android:id="@+id/reminder_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_normal"
+            android:text="@{reminderDataItem.title}"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/text_size_large"
+            tools:text="Reminder title" />
+
+        <TextView
+            android:id="@+id/reminder_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text='@{"("+reminderDataItem.location+")"}'
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/text_size_small" />
+
+        <TextView
+            android:id="@+id/reminder_description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Reminder Details"
-            android:textSize="@dimen/text_size_large"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:text="@{reminderDataItem.description}"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/text_size_normal"
+            tools:text="Reminder description" />
+
+        <TextView
+            android:id="@+id/lat_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(reminderDataItem.latitude)}"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/text_size_normal"
+            tools:text="0.0" />
+
+        <TextView
+            android:id="@+id/lng_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(reminderDataItem.longitude)}"
+            android:textColor="@android:color/darker_gray"
+            android:textSize="@dimen/text_size_normal"
+            tools:text="0.0" />
 
     </LinearLayout>
 </layout>
