@@ -94,7 +94,29 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             map.mapType = GoogleMap.MAP_TYPE_TERRAIN
             true
         }
-        else -> super.onOptionsItemSelected(item)
+        else -> {
+            setMapStyle()
+            true
+        }
+    }
+
+    private fun setMapStyle() {
+        try {
+            // Customize the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            val success = map.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    this@SelectLocationFragment.requireContext(),
+                    R.raw.map_style
+                )
+            )
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.")
+            }
+        } catch (e: Resources.NotFoundException) {
+            Log.e(TAG, "Can't find style. Error: ", e)
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -127,6 +149,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
                 latLng.latitude,
                 latLng.longitude
             )
+            _viewModel.reminderSelectedLocationStr.value = snippet
             map.addMarker(
                 MarkerOptions()
                     .position(latLng)
@@ -141,7 +164,10 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         map.setOnPoiClickListener { poi ->
             map.clear()
             _viewModel.clearSelectedLocation()
+            _viewModel.latitude.value = poi.latLng.latitude
+            _viewModel.longitude.value = poi.latLng.longitude
             _viewModel.selectedPOI.value = poi
+            _viewModel.reminderSelectedLocationStr.value = poi.name
 
             val poiMarker = map.addMarker(
                 MarkerOptions()
