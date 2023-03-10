@@ -45,7 +45,7 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
     /**
      * Save the reminder to the data source
      */
-    fun saveReminder(reminderData: ReminderDataItem) {
+    private fun saveReminder(reminderData: ReminderDataItem) {
         showLoading.value = true
         viewModelScope.launch {
             dataSource.saveReminder(
@@ -59,8 +59,6 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
                 )
             )
             showLoading.value = false
-            showToast.value = app.getString(R.string.reminder_saved)
-            navigationCommand.value = NavigationCommand.Back
         }
     }
 
@@ -87,5 +85,9 @@ class SaveReminderViewModel(val app: Application, val dataSource: ReminderDataSo
 
     fun clearSelectedPoi() {
         selectedPOI.value = null
+    }
+
+    fun navigateBack(){
+        navigationCommand.value = NavigationCommand.Back
     }
 }

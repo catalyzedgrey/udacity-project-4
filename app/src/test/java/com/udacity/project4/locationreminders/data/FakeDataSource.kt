@@ -11,9 +11,12 @@ class FakeDataSource(
     var shouldReturnError: Boolean = false
 
     override suspend fun getReminders(): Result<List<ReminderDTO>> {
-        return reminders?.toList()?.let {
-            Result.Success(it)
-        } ?: Result.Error("Test error - Not possible to load this reminder")
+        return if (shouldReturnError)
+            Result.Error("Test error - Not possible to load this reminder")
+        else
+            reminders?.toList()?.let {
+                Result.Success(it)
+            } ?: Result.Success(emptyList())
     }
 
     override suspend fun saveReminder(reminder: ReminderDTO) {

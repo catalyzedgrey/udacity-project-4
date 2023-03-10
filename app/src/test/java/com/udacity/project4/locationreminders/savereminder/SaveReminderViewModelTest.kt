@@ -12,10 +12,12 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.IsNull
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -33,6 +35,9 @@ class SaveReminderViewModelTest {
         saveReminderViewModel =
             SaveReminderViewModel(ApplicationProvider.getApplicationContext(), repo)
     }
+
+    @After
+    fun tearDownTests() = stopKoin()
 
     @Test
     fun validateAndSaveReminder_nullDescription_IsNotValid() {

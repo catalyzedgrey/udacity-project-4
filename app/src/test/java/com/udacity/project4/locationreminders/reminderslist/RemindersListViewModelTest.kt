@@ -11,7 +11,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.hamcrest.MatcherAssert.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.pauseDispatcher
+import kotlinx.coroutines.test.resumeDispatcher
 import kotlinx.coroutines.test.runBlockingTest
+import org.hamcrest.Matchers.*
 import org.hamcrest.core.IsEqual
 import org.junit.After
 import org.junit.Assert.*
@@ -23,7 +26,7 @@ import org.koin.core.context.stopKoin
 
 @RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
-class RemindersListViewModelTest {
+class remindersViewModel {
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
@@ -72,6 +75,20 @@ class RemindersListViewModelTest {
         assertThat(remindersViewModel.remindersList.value?.size, IsEqual(3))
     }
 
+    @Test
+    fun checkLoading_() = runBlocking {
+        //Given that three reminders are added
+        val reminder = ReminderDTO("Title0", "Desc0", "Location0", 0.0, 0.0)
+
+        repo.saveReminder(reminder)
+        repo.saveReminder(reminder.copy(title = "Title1"))
+        repo.saveReminder(reminder.copy(title = "Title2"))
+        remindersViewModel.loadReminders()
+
+        //the returned list size is correct
+        assertThat(remindersViewModel.remindersList.value?.size, IsEqual(3))
+    }
+
 
     @Test
     fun invalidateShowNoData_remindersListIsNull() {
@@ -84,4 +101,47 @@ class RemindersListViewModelTest {
         assertEquals(value, true)
     }
 
+
+    //LIVE DATA TESTING
+    @Test
+    fun reminderList_liveData(){
+        //Given a fresh ListViewModel
+
+        //When loading one reminder from fake database
+        remindersViewModel.loadReminders()
+
+        //Then the LiveData with remindersList should have all the reminders
+        val value = remindersViewModel.remindersList.getOrAwaitValue()
+        assertThat(value, (not(nullValue())))
+
+    }
+
+    @Test
+    fun loadReminders_loadData_error(){
+        //Given a fresh ListViewModel and set shouldGetAnError to true
+        repo.shouldReturnError = true
+
+        //When loading one reminder from fake database
+        remindersViewModel.loadReminders()
+
+        //Then the LiveData with remindersList should be null
+        val message = remindersViewModel.showSnackBar.getOrAwaitValue()
+        assertThat(message, (`is`("Test error - Not possible to load this reminder")))
+    }
+    
+
+    @Test
+    fun loadReminders_loading(){
+        //Given a fresh ListViewModel and pause dispatcher
+        mainCoroutineRule.pauseDispatcher()
+
+        //When loading one reminder from fake database
+        remindersViewModel.loadReminders()
+        assertThat(remindersViewModel.showLoading.getOrAwaitValue(), `is`(true))
+        mainCoroutineRule.resumeDispatcher()
+
+        //Show loading show disappear whe dispatcher resumes
+        assertThat(remindersViewModel.showLoading.getOrAwaitValue(), `is`(false))
+
+    }
 }
